@@ -1,0 +1,6 @@
+{
+  "name": "Lucky Spin Match",
+  "description": "A premium casino-style virtual slot game featuring beautiful glassmorphism, animated coin counter ratios, customized preset profiles with base64 upload, daily timers, and synthesized slot audio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
