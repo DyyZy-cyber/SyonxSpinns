@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Syonx Play Games — Lucky Spin</title>
+  <!-- Google Fonts: Plus Jakarta Sans for premium modern UI, Space Grotesk for slots numbers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Loading Splash Screen -->
+  <div id="loadingSplash" class="loading-splash">
+    <div class="loading-card animate-fade-in">
+      <div class="loading-icon-wrapper">
+        <svg class="loading-sparkle" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 7a5 5 0 100 10 5 5 0 000-10z" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1 class="loading-title">SYONX PLAY GAMES</h1>
+      <p class="loading-subtitle">LUCKY SPIN</p>
+      
+      <div class="progress-bar-container">
+        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+      </div>
+      
+      <div class="loading-status">
+        <span id="loadingStatusText">Menginisialisasi modul...</span>
+        <span id="loadingPercentText">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Game Container / Wrapper -->
+  <div class="app-wrapper">
+    
+    <!-- Header Area -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">✦</div>
+        <div class="brand-text">
+          <h2>SYONX PLAY</h2>
+          <span>Lucky Spin</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Coin Pill -->
+        <div class="coin-pill">
+          <span class="coin-icon">🪙</span>
+          <div class="coin-details">
+            <span class="coin-label">COIN</span>
+            <span id="headerCoinCount" class="coin-value">1,000</span>
+          </div>
+        </div>
+
+        <!-- Mute Toggle -->
+        <button id="muteToggle" class="icon-btn" title="Toggle Sound">
+          <svg id="soundOnIcon" viewBox="0 0 24 24" class="svg-icon stroke-emerald" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+          </svg>
+          <svg id="soundOffIcon" viewBox="0 0 24 24" class="svg-icon stroke-rose hidden" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6L4.54 3.51a.75.75 0 111.06-1.06l15.9 15.9a.75.75 0 01-1.06 1.06L14.73 13.7l-3.2 3.2a.75.75 0 01-1.28-.53V10.15l-3.5-3.5H3.01c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 011 4.5c0-.83.112-1.633.322-2.396C1.556 1.256 2.38 .75 3.26.75h2.24l1-1z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- App Content Pages Wrapper -->
+    <main class="app-content">
+      
+      <!-- PAGE 1: HOME (Lucky Emoji Spin Game) -->
+      <section id="pageHome" class="page-section active">
+        <div class="card glass-panel text-center">
+          
+          <div class="banner">
+            <span class="shiny-badge">★ SYONX PLAY GAMES</span>
+            <h1 class="main-title">LUCKY EMOJI SPIN</h1>
+            <p class="subtitle">Play hockey reels and stack your coins without limits!</p>
+          </div>
+
+          <!-- Slots Frame -->
+          <div class="slots-machine">
+            <div class="slot-win-line"></div>
+            
+            <div class="reels-container">
+              <!-- Reel 1 -->
+              <div class="reel-window">
+                <div id="reel1" class="reel-strip">
+                  <div class="emoji-box">💎</div>
+                </div>
+              </div>
+
+              <!-- Reel 2 -->
+              <div class="reel-window">
+                <div id="reel2" class="reel-strip">
+                  <div class="emoji-box">⭐</div>
+                </div>
+              </div>
+
+              <!-- Reel 3 -->
+              <div class="reel-window">
+                <div id="reel3" class="reel-strip">
+                  <div class="emoji-box">🍀</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Premium Minimalist Bet Selection Panel -->
+          <div class="bet-selection-panel">
+            <div class="bet-control-group">
+              <span class="control-label text-sky">↺ PILIH JUMLAH PUTARAN SPIN</span>
+              <div class="spin-count-row">
+                <button type="button" class="spin-count-btn active" data-count="1">1X SPIN</button>
+                <button type="button" class="spin-count-btn" data-count="5">5X SPIN</button>
+                <button type="button" class="spin-count-btn" data-count="10">10X SPIN</button>
+                <button type="button" class="spin-count-btn" data-count="20">20X SPIN</button>
+              </div>
+            </div>
+            
+            <div class="session-cost-indicator">
+              <span>Total Koin:</span>
+              <span id="sessionTotalCost" class="cost-value">🪙 10 Koin</span>
+            </div>
+          </div>
+
+          <!-- Interaction Feedback Text -->
+          <div class="status-messenger">
+            <span id="spinFeedback" class="feedback-bubble">Sentuh tombol di bawah untuk memutar keberuntungan!</span>
+          </div>
+
+          <!-- Spin Action Buttons -->
+          <div class="action-footer">
+            <button id="spinBtn" class="premium-btn">
+              <span class="btn-ripple-container"></span>
+              <span class="btn-content">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                SPIN SEKARANG
+              </span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Mini Payout Multiplier List -->
+        <div class="card glass-panel mt-6">
+          <h3 class="paytable-title">
+            <span class="paytable-icon">🏆</span>
+            Daftar Multiplier Keberuntungan
+          </h3>
+          <div class="paytable-grid" id="multiplierGrid">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 2: HISTORY (Logs & Search) -->
+      <section id="pageHistory" class="page-section">
+        <div class="card glass-panel">
+          <div class="history-header">
+            <div>
+              <h2 class="section-title">RIWAYAT PUTARAN</h2>
+              <p class="subtitle">Pantau putaran hoki dan perolehan koin Anda</p>
+            </div>
+            <button id="clearHistoryBtn" class="danger-btn flex items-center gap-1">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Hapus Semua
+            </button>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="search-box">
+            <div class="search-input-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="historySearch" placeholder="Cari emoji atau status riwayat...">
+            </div>
+            
+            <div class="filter-pills">
+              <button class="filter-pill active" data-filter="all">Semua</button>
+              <button class="filter-pill" data-filter="jackpot">🏆 Triple</button>
+              <button class="filter-pill" data-filter="twin">⭐ Duo</button>
+              <button class="filter-pill" data-filter="lose">❌ Zonk</button>
+            </div>
+          </div>
+
+          <!-- History List container -->
+          <div class="history-list" id="historyListContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 3: COINS (Daily Reward & Achievements System) -->
+      <section id="pageCoins" class="page-section">
+        <!-- Daily Gift Card -->
+        <div class="card glass-panel text-center relative overflow-hidden mb-6">
+          <div class="neon-ambient-glow"></div>
+          
+          <h2 class="section-title text-center flex-center gap-2">
+            <span class="sparkle-rainbow">🎁</span>
+            KLAIM HADIAH HARIAN
+          </h2>
+          <p class="subtitle">Buka peti misteri setiap 24 jam untuk mendapatkan koin gratis!</p>
+
+          <div class="daily-chest-wrapper">
+            <!-- Box container -->
+            <div id="dailyChest" class="daily-chest can-claim">
+              <div class="chest-front">🎁</div>
+            </div>
+
+            <div id="countdownBox" class="countdown-container hidden">
+              <span class="countdown-label">Klaim Terkunci. Tunggu:</span>
+              <span id="dailyCountdownText" class="countdown-timer">00:00:00</span>
+            </div>
+
+            <div id="dailyActionContainer" class="mt-4">
+              <button id="claimDailyBtn" class="premium-btn">KLAIM SEKARANG</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Achievements Badges Grid -->
+        <div class="card glass-panel">
+          <h2 class="section-title">🏆 PENCAPAIAN GAME</h2>
+          <p class="subtitle">Selesaikan tugas dan kumpulkan medali keberuntungan</p>
+
+          <div class="badge-grid" id="achievementsGrid">
+            <!-- Loaded dynamically in JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 4: PROFILE (Avatar Custom, Username & Bio) -->
+      <section id="pageProfile" class="page-section">
+        <div class="card glass-panel">
+          
+          <!-- Large Avatar Display Section -->
+          <div class="profile-card relative text-center">
+            <div class="profile-avatar-wrapper">
+              <div id="profileAvatarDisplay" class="profile-avatar">🕵️</div>
+              <button id="editProfileBtn" class="avatar-edit-pencil" title="Edit Profil">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+              </button>
+            </div>
+
+            <h3 id="profileUsername" class="profile-display-name">Username Anda</h3>
+            <p id="profileBio" class="profile-display-bio">Mengejar bintang hoki virtual di Lucky Emoji Spin!</p>
+            <div class="join-date-pill">Bintang Keberuntungan Terdaftar • Sejak <span id="profileJoinDate">2026-06</span></div>
+          </div>
+
+          <!-- Statistics Summary grid -->
+          <div class="profile-stats-grid">
+            <div class="stat-card">
+              <span class="stat-title">Total Spin</span>
+              <span id="statTotalSpins" class="stat-number">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Jackpot (3x)</span>
+              <span id="statJackpots" class="stat-number text-emerald">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Kembar Duo (2x)</span>
+              <span id="statTwins" class="stat-number text-sky">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">Rasio Kemenangan</span>
+              <span id="statWinRate" class="stat-number text-gold">0%</span>
+            </div>
+          </div>
+
+          <!-- Utility Reset Settings Option -->
+          <div class="profile-utility-actions text-center border-t-white mt-6 pt-4">
+            <button id="resetAppBtn" class="ghost-danger-btn">
+              Reset Semua Data Aplikasi (LocalStorage)
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Animated Navigation Bar Footer -->
+    <footer class="app-nav">
+      <button class="nav-item active" data-tab="home">
+        <span class="nav-indicator"></span>
+        <svg viewBox="0 0 24 24" class="nav-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+        <span class="nav-label">Home</span>
+      </button>
+
+      <button class="nav-item" data-tab="history">
+        <span class="nav-indicator"></span>
+        <svg viewBox="0 0 24 24" class="nav-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+        <span class="nav-label">History</span>
+      </button>
+
+      <button class="nav-item" data-tab="coins">
+        <span class="nav-indicator"></span>
+        <div class="nav-gift-dot-container">
+          <div id="navDailyRewardAlert" class="pulse-dot hidden"></div>
+          <svg viewBox="0 0 24 24" class="nav-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h17.25c.621 0 1.125-.504 1.125-1.125V9.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+          </svg>
+        </div>
+        <span class="nav-label">Claim</span>
+      </button>
+
+      <button class="nav-item" data-tab="profile">
+        <span class="nav-indicator"></span>
+        <svg viewBox="0 0 24 24" class="nav-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        </svg>
+        <span class="nav-label">Profile</span>
+      </button>
+    </footer>
+
+    <!-- Small Footer legal disclaimer -->
+    <div class="legal-footnote">
+      SYONX LUCKY EMOJI SPIN • Hanya untuk bersenang-senang. Tidak melibatkan uang sungguhan atau transaksi keuangan.
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT PROFILE WITH FILE UPLOAD -->
+  <div id="editProfileModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Edit Kredensial Profil</h3>
+        <button class="modal-close-btn" data-modal="editProfileModal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="editProfileForm">
+          <!-- Live Preview Avatar -->
+          <div class="avatar-live-preview-box">
+            <div id="modalAvatarPreview" class="profile-avatar mb-2">🕵️</div>
+            <span class="font-mono text-xs text-slate-400">Tinjauan Gambar</span>
+          </div>
+
+          <!-- Avatar Preset Selection -->
+          <div class="form-group">
+            <label class="form-label">Pilih Karakter Emoji</label>
+            <div class="avatar-presets-scroller" id="avatarPresetsGrid">
+              <!-- Inline values injected by JS -->
+            </div>
+          </div>
+
+          <!-- Image Upload Option -->
+          <div class="form-group border-t-white pt-3">
+            <label class="form-label">Atau Unggah Gambar Kustom (Gratis)</label>
+            <div class="custom-file-upload">
+              <input type="file" id="avatarFileInput" accept="image/*" class="hidden-input">
+              <button type="button" id="customUploadTrigger" class="upload-btn">
+                <svg viewBox="0 0 24 24" class="inline-svg-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Pilih File Gambar
+              </button>
+              <span id="fileUploadStatus" class="upload-status">Maksimal 1MB, format file umum</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputUsername" class="form-label">Username</label>
+            <input type="text" id="inputUsername" class="text-input" maxlength="20" required placeholder="Tulis nama panggilan baru...">
+          </div>
+
+          <div class="form-group">
+            <label for="inputBio" class="form-label font-sans font-semibold text-slate-300">Biografi Kustom</label>
+            <textarea id="inputBio" class="text-area" maxlength="130" placeholder="Biografi singkat menarik pemain..."></textarea>
+          </div>
+
+          <div class="modal-footer pt-4 flex justify-between">
+            <button type="button" class="btn secondary-btn" data-modal="editProfileModal">Batal</button>
+            <button type="submit" class="btn primary-btn font-black text-slate-950 font-mono tracking-wider">SIMPAN PERUBAHAN</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM CONFIRMATION POPUP MODAL (NO WINDOW.CONFIRM) -->
+  <div id="confirmModal" class="modal-overlay">
+    <div class="modal-container max-w-xs">
+      <div class="modal-header">
+        <h3 id="confirmTitle" class="text-white text-base">Konfirmasi Penting</h3>
+        <button class="modal-close-btn" data-modal="confirmModal">&times;</button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <p id="confirmMessage" class="text-xs text-slate-300 leading-relaxed">Apakah Anda yakin akan menghapus seluruh rekaman riwayat ini?</p>
+      </div>
+      <div class="modal-footer flex gap-2 justify-end">
+        <button id="confirmCancelBtn" class="btn secondary-btn" data-modal="confirmModal">Batal</button>
+        <button id="confirmConfirmBtn" class="btn danger-btn text-[11px] font-bold">Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXQUISITE BIG REWARD WIN POPUP -->
+  <div id="winEpicPopup" class="modal-overlay">
+    <div class="modal-container max-w-xs animate-bounce-elastic flex flex-col items-center py-6 text-center shadow-lg relative overflow-hidden">
+      <!-- Glow effects inside the win screen -->
+      <div class="sparkling-fireworks"></div>
+      
+      <div class="win-crown">👑</div>
+      <h2 id="winPopupType" class="win-combo-title uppercase tracking-widest text-[#fbbf24]">SUPER TRIPLE JACKPOT!</h2>
+      <p id="winPopupDescription" class="text-xs text-slate-400 mt-1 max-w-[200px]">Semua gulungan menghasilkan kecocokan sempurna!</p>
+      
+      <div class="win-coins-display">
+        <span class="coin-jump">🪙</span>
+        <span id="winPopupAwardedText" class="win-count">+500</span>
+      </div>
+
+      <button id="winPopupDismissBtn" class="premium-btn w-full max-w-[180px] font-black h-11 text-slate-950 text-xs">AMBIL HADIAH</button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="toast-sidebar flex flex-col gap-2"></div>
+
+  <!-- CANVAS FOR CUSTOM confettis EMITTER -->
+  <canvas id="particlesCanvas" class="particles-canvas"></canvas>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
