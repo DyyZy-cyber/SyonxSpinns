@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plinko Ball — Syonx Play</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{
+  background:#0a0a0f;color:#e2e8f0;
+  font-family:'Segoe UI',system-ui,sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:16px 14px 40px;
+}
+.header{
+  width:100%;max-width:400px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.header-logo{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:#94a3b8;text-transform:uppercase;}
+.coin-display{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);
+  border-radius:20px;padding:4px 12px;
+  font-size:0.82rem;font-weight:700;color:#f59e0b;
+}
+.game-title{
+  font-size:1.25rem;font-weight:800;letter-spacing:0.08em;
+  text-align:center;color:#f1f5f9;margin-bottom:2px;
+}
+.game-subtitle{
+  font-size:0.65rem;color:rgba(255,255,255,0.28);
+  text-align:center;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;
+}
+
+/* Progress counter */
+.progress-counter{
+  width:100%;max-width:400px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:8px;min-height:20px;
+}
+.progress-dots{display:flex;gap:4px;align-items:center;}
+.pdot{
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(255,255,255,0.12);
+  transition:all 0.25s;
+}
+.pdot.done{background:#22c55e;}
+.pdot.active{background:#f59e0b;transform:scale(1.3);}
+.progress-text{font-size:0.68rem;color:rgba(255,255,255,0.35);letter-spacing:0.06em;}
+
+/* Canvas */
+.canvas-wrapper{
+  width:100%;max-width:400px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;overflow:hidden;position:relative;
+}
+canvas{display:block;width:100%;}
+
+/* Slots */
+.slots{display:flex;width:100%;border-top:1px solid rgba(255,255,255,0.05);}
+.slot{
+  flex:1;padding:7px 1px;text-align:center;
+  font-size:0.58rem;font-weight:700;letter-spacing:0.02em;
+  transition:all 0.25s;position:relative;
+}
+.slot+.slot{border-left:1px solid rgba(255,255,255,0.04);}
+.slot.zonk{color:#ef4444;}
+.slot.low {color:#64748b;}
+.slot.mid {color:#94a3b8;}
+.slot.high{color:#e2e8f0;}
+.slot.top {color:#f59e0b;}
+.slot.active{background:rgba(255,255,255,0.06);}
+.slot.active.zonk{background:rgba(239,68,68,0.1);color:#fca5a5;}
+.slot.active.top {background:rgba(245,158,11,0.12);color:#fde68a;}
+.slot.active.high{background:rgba(226,232,240,0.08);}
+.slot.active.mid {background:rgba(148,163,184,0.08);}
+
+/* Result */
+.result-bar{
+  width:100%;max-width:400px;
+  min-height:36px;margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  padding:0 14px;
+  transition:all 0.3s;
+}
+.result-bar.show-win {border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.06);}
+.result-bar.show-zonk{border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.05);}
+.result-label2{font-size:0.62rem;color:rgba(255,255,255,0.3);letter-spacing:0.08em;text-transform:uppercase;}
+.result-amount{font-size:1rem;font-weight:800;color:#e2e8f0;transition:color 0.3s;}
+.result-amount.win {color:#f59e0b;}
+.result-amount.zonk{color:#ef4444;}
+
+/* Controls */
+.controls{width:100%;max-width:400px;margin-top:10px;display:flex;flex-direction:column;gap:8px;}
+.multi-btns{display:flex;gap:6px;}
+.multi-btn{
+  flex:1;padding:8px 2px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;color:rgba(255,255,255,0.4);
+  font-size:0.7rem;font-weight:600;
+  cursor:pointer;transition:all 0.18s;text-align:center;line-height:1.4;
+}
+.multi-btn:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7);}
+.multi-btn.active{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.35);color:#f59e0b;}
+.play-btn{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,#1e293b,#334155);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;color:#f1f5f9;
+  font-size:0.9rem;font-weight:700;letter-spacing:0.04em;
+  cursor:pointer;transition:all 0.18s;
+}
+.play-btn:hover:not(:disabled){background:linear-gradient(135deg,#253348,#3d4f6b);border-color:rgba(255,255,255,0.15);}
+.play-btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+/* Session log */
+.session-log{
+  width:100%;max-width:400px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;padding:10px 12px;margin-top:8px;
+}
+.slog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.slog-title{font-size:0.62rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;}
+.slog-total{font-size:0.75rem;font-weight:700;color:#f59e0b;}
+.slog-items{display:flex;flex-wrap:wrap;gap:5px;}
+.slog-item{
+  font-size:0.65rem;font-weight:600;padding:3px 8px;border-radius:5px;
+  animation:slogPop 0.25s cubic-bezier(.34,1.56,.64,1) both;
+}
+.slog-item.win {background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);}
+.slog-item.zonk{background:rgba(239,68,68,0.08);color:#ef4444;border:1px solid rgba(239,68,68,0.15);}
+@keyframes slogPop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+/* Floating reward anim */
+.float-reward{
+  position:fixed;pointer-events:none;
+  font-size:1.1rem;font-weight:800;
+  animation:floatUp 1s ease-out forwards;
+  z-index:999;
+}
+@keyframes floatUp{
+  0%  {opacity:1;transform:translateY(0) scale(1);}
+  100%{opacity:0;transform:translateY(-80px) scale(0.7);}
+}
+
+/* Stats */
+.stats-row{width:100%;max-width:400px;display:flex;gap:6px;margin-top:8px;}
+.stat-box{
+  flex:1;background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:9px;padding:9px 6px;text-align:center;
+}
+.s-label{font-size:0.58rem;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.06em;}
+.s-val{font-size:0.92rem;font-weight:700;color:#94a3b8;margin-top:2px;}
+</style>
+</head>
+<body>
+
+<div id="plinkSplash" style="position:fixed;inset:0;background:#0a0a0f;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div style="font-size:2rem;">🎱</div>
+  <div style="font-size:1rem;font-weight:800;letter-spacing:0.1em;color:#f1f5f9;">PLINKO BALL</div>
+  <div style="width:180px;height:3px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;">
+    <div id="plinkProgress" style="height:100%;width:0%;background:linear-gradient(90deg,#f59e0b,#ef4444);transition:width 0.15s;"></div>
+  </div>
+  <div id="plinkStatus" style="font-size:0.65rem;color:rgba(255,255,255,0.3);letter-spacing:0.08em;text-transform:uppercase;">Memuat arena...</div>
+</div>
+
+
+<div class="header">
+  <div class="header-logo"><span onclick="history.back()" style="color:inherit;cursor:pointer;">← Kembali</span></div>
+  <div class="coin-display">🪙 <span id="coinCount">0</span></div>
+</div>
+
+<div class="game-title">PLINKO BALL</div>
+<div class="game-subtitle">Drop · Bounce · Win</div>
+
+<div class="progress-counter" id="progressCounter" style="visibility:hidden;">
+  <div class="progress-dots" id="progressDots"></div>
+  <div class="progress-text" id="progressText"></div>
+</div>
+
+<div class="canvas-wrapper">
+  <canvas id="plinkCanvas"></canvas>
+  <div class="slots" id="slotsRow">
+    <div class="slot zonk">ZONK</div>
+    <div class="slot low">+10</div>
+    <div class="slot mid">+40</div>
+    <div class="slot high">+80</div>
+    <div class="slot top">+120</div>
+    <div class="slot high">+80</div>
+    <div class="slot mid">+40</div>
+    <div class="slot low">+10</div>
+    <div class="slot zonk">ZONK</div>
+  </div>
+</div>
+
+<div class="result-bar" id="resultBar">
+  <span class="result-label2">Hasil</span>
+  <span class="result-amount" id="resultAmount">—</span>
+</div>
+
+<!-- session log -->
+<div class="session-log" id="sessionLog" style="display:none;">
+  <div class="slog-header">
+    <span class="slog-title">Hasil Sesi</span>
+    <span class="slog-total" id="slogTotal"></span>
+  </div>
+  <div class="slog-items" id="slogItems"></div>
+</div>
+
+<div class="controls">
+  <div class="multi-btns">
+    <div class="multi-btn active" data-times="1"  onclick="selectTimes(this)">1x<br><small>30🪙</small></div>
+    <div class="multi-btn" data-times="3"  onclick="selectTimes(this)">3x<br><small>90🪙</small></div>
+    <div class="multi-btn" data-times="5"  onclick="selectTimes(this)">5x<br><small>150🪙</small></div>
+    <div class="multi-btn" data-times="10" onclick="selectTimes(this)">10x<br><small>300🪙</small></div>
+  </div>
+  <button class="play-btn" id="playBtn" onclick="startSession()">DROP BALL — 30 🪙</button>
+</div>
+
+<div class="stats-row">
+  <div class="stat-box"><div class="s-label">Total Drop</div><div class="s-val" id="statDrops">0</div></div>
+  <div class="stat-box"><div class="s-label">Menang</div><div class="s-val" id="statWins">0</div></div>
+  <div class="stat-box"><div class="s-label">Diperoleh</div><div class="s-val" id="statEarned">0</div></div>
+</div>
+
+<script>
+const REWARDS  = [0, 10, 40, 80, 120, 80, 40, 10, 0];
+const COST     = 30;
+const ROWS     = 9;
+const BALL_R   = 6;
+const PEG_R    = 3.5;
+const CANVAS_H = 320;
+
+let totalDrops = 0, totalWins = 0, totalEarned = 0;
+
+function getCoins() {
+  try {
+    const p = JSON.parse(localStorage.getItem('emoji_spin_profile') || '{}');
+    return p.totalCoins || 0;
+  } catch(e) { return 0; }
+}
+function setCoins(val) {
+  try {
+    const raw = localStorage.getItem('emoji_spin_profile');
+    const p = raw ? JSON.parse(raw) : {};
+    p.totalCoins = val;
+    localStorage.setItem('emoji_spin_profile', JSON.stringify(p));
+    document.getElementById('coinCount').textContent = val.toLocaleString();
+    // trigger achievement check di main app
+    if (window.evaluateAchievementsUnlocks) window.evaluateAchievementsUnlocks();
+  } catch(e) {}
+}
+let selectedTimes = 1;
+let sessionQueue = [], sessionDone = 0, sessionTotal = 0, sessionCoins = 0;
+let animId = null;
+let ball = null;
+
+// Canvas setup
+const canvas = document.getElementById('plinkCanvas');
+const ctx    = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const W = canvas.parentElement.clientWidth;
+  canvas.width  = W;
+  canvas.height = CANVAS_H;
+  buildPegs();
+  drawStatic();
+}
+
+// Pegs — full grid spanning full width
+let pegs = [];
+let slotW = 0;
+
+function buildPegs() {
+  pegs = [];
+  const W = canvas.width;
+  slotW = W / REWARDS.length;
+  const topY  = 30;
+  const botY  = CANVAS_H - 28;
+  const rowH  = (botY - topY) / (ROWS - 1);
+  // peg spacing = slotW (matches slots exactly)
+  const pegSpacing = slotW;
+
+  for (let row = 0; row < ROWS; row++) {
+    // row 0 has 2 pegs, row 8 has 10 pegs
+    const cols   = row + 2;
+    // center the row
+    const span   = (cols - 1) * pegSpacing;
+    const startX = (W - span) / 2;
+    const y      = topY + row * rowH;
+    for (let col = 0; col < cols; col++) {
+      pegs.push({ x: startX + col * pegSpacing, y });
+    }
+  }
+}
+
+function drawStatic() {
+  const W = canvas.width;
+  ctx.clearRect(0, 0, W, CANVAS_H);
+  // subtle lane lines
+  for (let i = 1; i < REWARDS.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * slotW, CANVAS_H - 18);
+    ctx.lineTo(i * slotW, CANVAS_H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  // pegs
+  pegs.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, PEG_R, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(226,232,240,0.2)';
+    ctx.fill();
+  });
+}
+
+// Ball class — sequential, one at a time
+class Ball {
+  constructor(onLand) {
+    const W = canvas.width;
+    this.x  = W / 2 + (Math.random() - 0.5) * 4;
+    this.y  = 8;
+    this.vx = (Math.random() - 0.5) * 0.8;
+    this.vy = 0.5;
+    this.onLand = onLand;
+    this.landed = false;
+    this.trail  = [];
+    this.stuckTimer = 0;
+    this.prevY  = this.y;
+  }
+
+  update() {
+    if (this.landed) return;
+
+    const W = canvas.width;
+    const FLOOR = CANVAS_H - 18;
+
+    this.vy += 0.13; // gravity
+    // cap speed
+    const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+    if (speed > 5) { this.vx *= 5/speed; this.vy *= 5/speed; }
+
+    this.x += this.vx;
+    this.y += this.vy;
+
+    // peg collisions
+    for (const p of pegs) {
+      const dx   = this.x - p.x;
+      const dy   = this.y - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const minD = BALL_R + PEG_R;
+      if (dist < minD && dist > 0) {
+        const nx = dx / dist;
+        const ny = dy / dist;
+        // push out
+        this.x = p.x + nx * (minD + 0.5);
+        this.y = p.y + ny * (minD + 0.5);
+        if(typeof playTick!=="undefined")playTick();
+        // reflect
+        const dot = this.vx*nx + this.vy*ny;
+        this.vx = (this.vx - 2*dot*nx) * 0.5;
+        this.vy = (this.vy - 2*dot*ny) * 0.5;
+        // nudge sideways so it never sits still
+        this.vx += (Math.random()-0.5) * 1.0;
+        if (this.vy < 0.5) this.vy = 0.5;
+        break; // one peg at a time
+      }
+    }
+
+    // walls
+    if (this.x < BALL_R)   { this.x = BALL_R;   this.vx =  Math.abs(this.vx)*0.6; }
+    if (this.x > W-BALL_R) { this.x = W-BALL_R; this.vx = -Math.abs(this.vx)*0.6; }
+
+    // stuck guard — if barely moving for 60 frames, nudge
+    if (Math.abs(this.y - this.prevY) < 0.3) {
+      this.stuckTimer++;
+      if (this.stuckTimer > 60) {
+        this.vy += 1.5;
+        this.vx += (Math.random()-0.5)*2;
+        this.stuckTimer = 0;
+      }
+    } else {
+      this.stuckTimer = 0;
+    }
+    this.prevY = this.y;
+
+    // trail
+    this.trail.push({ x: this.x, y: this.y });
+    if (this.trail.length > 10) this.trail.shift();
+
+    // land
+    if (this.y >= FLOOR) {
+      this.y = FLOOR;
+      this.landed = true;
+      const slot = Math.max(0, Math.min(REWARDS.length-1, Math.floor(this.x / slotW)));
+      this.onLand(slot);
+    }
+  }
+
+  draw() {
+    if (this.landed) return;
+    // trail
+    this.trail.forEach((t, i) => {
+      const a = (i / this.trail.length) * 0.18;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, BALL_R * 0.6 * (i/this.trail.length), 0, Math.PI*2);
+      ctx.fillStyle = `rgba(241,245,249,${a})`;
+      ctx.fill();
+    });
+    // ball — clean white circle with subtle gradient
+    const g = ctx.createRadialGradient(this.x-1.5, this.y-1.5, 0.5, this.x, this.y, BALL_R);
+    g.addColorStop(0, '#f8fafc');
+    g.addColorStop(0.5, '#cbd5e1');
+    g.addColorStop(1, '#475569');
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, BALL_R, 0, Math.PI*2);
+    ctx.fillStyle = g;
+    ctx.fill();
+  }
+}
+
+// Animation loop
+function tick() {
+  drawStatic();
+  if (ball) {
+    ball.update();
+    ball.draw();
+    if (!ball.landed) {
+      animId = requestAnimationFrame(tick);
+    }
+    // if landed, onLand already called — next ball launched from there
+  }
+}
+
+// Session management
+function startSession() {
+  if (ball && !ball.landed) return;
+  const total = COST * selectedTimes;
+  if (getCoins() < total) { showToast('Koin tidak cukup!'); return; }
+  setCoins(getCoins() - total);
+  updateUI();
+
+  sessionTotal = selectedTimes;
+  sessionDone  = 0;
+  sessionQueue = Array.from({length: selectedTimes}, () => null);
+  sessionCoins = 0;
+
+  // reset log
+  const log = document.getElementById('sessionLog');
+  const items = document.getElementById('slogItems');
+  items.innerHTML = '';
+  if (selectedTimes > 1) log.style.display = 'block';
+  else log.style.display = 'none';
+  document.getElementById('slogTotal').textContent = '';
+
+  document.getElementById('playBtn').disabled = true;
+  updateProgress();
+  launchNext();
+}
+
+function launchNext() {
+  if(typeof playDrop!=="undefined")playDrop();
+  ball = new Ball((slot) => {
+    const reward = REWARDS[slot];
+    sessionDone++;
+    sessionCoins += reward;
+    totalDrops++;
+    if (reward > 0) { totalWins++; totalEarned += reward; }
+    setCoins(getCoins() + reward);
+    updateUI();
+    showResult(slot, reward);
+    updateProgress();
+    addSessionLog(reward);
+    spawnFloat(reward);
+
+    // wait a bit then next or finish
+    setTimeout(() => {
+      if (sessionDone < sessionTotal) {
+        launchNext();
+      } else {
+        // session done
+        setTimeout(() => {
+          document.getElementById('playBtn').disabled = false;
+          hideProgress();
+        }, 800);
+      }
+    }, 600);
+  });
+  cancelAnimationFrame(animId);
+  tick();
+}
+
+// Progress dots
+function updateProgress() {
+  const pc = document.getElementById('progressCounter');
+  const pd = document.getElementById('progressDots');
+  const pt = document.getElementById('progressText');
+
+  if (sessionTotal <= 1) { pc.style.visibility='hidden'; return; }
+  pc.style.visibility = 'visible';
+
+  // max 10 dots, else text only
+  if (sessionTotal <= 10) {
+    pd.innerHTML = Array.from({length: sessionTotal}, (_,i) => {
+      let cls = 'pdot';
+      if (i < sessionDone) cls += ' done';
+      else if (i === sessionDone) cls += ' active';
+      return `<div class="${cls}"></div>`;
+    }).join('');
+    pt.textContent = `${sessionDone} / ${sessionTotal}`;
+  } else {
+    pd.innerHTML = '';
+    pt.textContent = `${sessionDone} / ${sessionTotal}`;
+  }
+}
+
+function hideProgress() {
+  document.getElementById('progressCounter').style.visibility='hidden';
+}
+
+// Result bar
+function showResult(slot, reward) {
+  const slots = document.querySelectorAll('.slot');
+  slots.forEach(s => s.classList.remove('active'));
+  slots[slot].classList.add('active');
+  setTimeout(() => slots.forEach(s => s.classList.remove('active')), 700);
+
+  const bar = document.getElementById('resultBar');
+  const amt = document.getElementById('resultAmount');
+  bar.className = 'result-bar';
+  if (reward === 0) {
+    amt.textContent = 'ZONK';
+    amt.className = 'result-amount zonk';
+    bar.classList.add('show-zonk');
+    if(typeof playZonk!=="undefined")playZonk();
+  } else {
+    amt.textContent = `+${reward} 🪙`;
+    amt.className = 'result-amount win';
+    bar.classList.add('show-win');
+    if(typeof playWin!=="undefined")playWin(reward);
+  }
+}
+
+function addSessionLog(reward) {
+  if (sessionTotal <= 1) return;
+  const items = document.getElementById('slogItems');
+  const el = document.createElement('div');
+  el.className = 'slog-item ' + (reward > 0 ? 'win' : 'zonk');
+  el.textContent = reward > 0 ? `+${reward}` : 'ZONK';
+  items.appendChild(el);
+  // update total
+  const total = document.getElementById('slogTotal');
+  total.textContent = sessionCoins > 0 ? `+${sessionCoins} 🪙` : sessionCoins === 0 && sessionDone > 0 ? '0 🪙' : '';
+}
+
+function spawnFloat(reward) {
+  const el = document.createElement('div');
+  el.className = 'float-reward';
+  el.textContent = reward > 0 ? `+${reward} 🪙` : 'ZONK';
+  el.style.color = reward > 0 ? '#f59e0b' : '#ef4444';
+  // posisi di tengah canvas
+  const rect = canvas.getBoundingClientRect();
+  el.style.left = (rect.left + rect.width/2 - 30) + 'px';
+  el.style.top  = (rect.top + rect.height/2) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function selectTimes(el) {
+  document.querySelectorAll('.multi-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  selectedTimes = parseInt(el.dataset.times);
+  document.getElementById('playBtn').textContent = `DROP BALL — ${COST*selectedTimes} 🪙`;
+}
+
+function updateUI() {
+  document.getElementById('coinCount').textContent = getCoins().toLocaleString();
+  document.getElementById('statDrops').textContent  = totalDrops;
+  document.getElementById('statWins').textContent   = totalWins;
+  document.getElementById('statEarned').textContent = totalEarned;
+}
+
+function showToast(msg) { alert(msg); }
+
+// Init
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+document.getElementById('coinCount').textContent = getCoins().toLocaleString();
+
+// === AUDIO ===
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let _actx = null;
+function _ac() { if (!_actx) _actx = new AudioCtx(); return _actx; }
+function playTick() {
+  try {
+    const ctx=_ac(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.setValueAtTime(600+Math.random()*400,ctx.currentTime);
+    o.type='sine';
+    g.gain.setValueAtTime(0.3,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.05);
+    o.start();o.stop(ctx.currentTime+0.05);
+  } catch(e){}
+}
+function playWin(reward) {
+  try {
+    const ctx=_ac();
+    const freqs=reward>=120?[523,659,784,1047]:reward>=80?[440,554,659]:[440,523];
+    freqs.forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=f;o.type='triangle';
+      const t=ctx.currentTime+i*0.08;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(0.5,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+      o.start(t);o.stop(t+0.25);
+    });
+  } catch(e){}
+}
+function playZonk() {
+  try {
+    const ctx=_ac(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(200,ctx.currentTime);
+    o.frequency.linearRampToValueAtTime(80,ctx.currentTime+0.3);
+    g.gain.setValueAtTime(0.5,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
+    o.start();o.stop(ctx.currentTime+0.3);
+  } catch(e){}
+}
+function playDrop() {
+  try {
+    const ctx=_ac(),o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type='sine';
+    o.frequency.setValueAtTime(600,ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(300,ctx.currentTime+0.15);
+    g.gain.setValueAtTime(0.4,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
+    o.start();o.stop(ctx.currentTime+0.15);
+  } catch(e){}
+}
+
+// === LOADING ===
+(function(){
+  const splash=document.getElementById('plinkSplash');
+  const bar=document.getElementById('plinkProgress');
+  const status=document.getElementById('plinkStatus');
+  const labels=['Memuat arena...','Menyiapkan bola...','Mengatur peg...','Siap!'];
+  let pct=0;
+  const iv=setInterval(()=>{
+    pct+=Math.random()*25+10;
+    if(pct>=100){
+      pct=100;clearInterval(iv);
+      bar.style.width='100%';
+      status.textContent='Siap!';
+      setTimeout(()=>{
+        splash.style.transition='opacity 0.4s';
+        splash.style.opacity='0';
+        setTimeout(()=>splash.remove(),400);
+      },300);
+    }
+    bar.style.width=pct+'%';
+    status.textContent=labels[Math.min(3,Math.floor(pct/25))];
+  },120);
+})();
+
+</script>
+</body>
+</html>
